@@ -37,38 +37,45 @@ class MainHandler(webapp2.RequestHandler):
         response.raise_for_status()
         soup = bs4.BeautifulSoup(response.content)
         urls = []
-        music_urls = []
         for anchor in soup.find_all('a'):
             url = anchor['href']
             if '.zip' in url:
                 if not 'NOMUSIC' in url:
                     urls.append(['http://tankorsmash.com/sharefolderzip/'+url,
-                                [int(sec) for sec in url.lstrip('v').rstrip('.zip').split('_')],
-                                url])
-                else:
-                    orig_url = url
-                    url = url.replace("_NOMUSIC", "")
-                    music_urls.append(['http://tankorsmash.com/sharefolderzip/'+orig_url,
-                                [int(sec) for sec in url.lstrip('v').rstrip('.zip').split('_')],
-                                url])
+                                 [int(sec) for sec in url.lstrip('v').rstrip('.zip').split('_')],
+                                 url])
         urls = sorted(urls, key=lambda x: x[1])
         analytics = "onclick=\"var that=this;_gaq.push(['_trackEvent','Download','PDF',this.href]);setTimeout(function(){location.href=that.href;},200);return false;\""
         for pair in urls:
             build_url = '<a href="%s" %s title="Latest Binary for Windows. Runs on Wine">%s, the latest version</a><br>' % (pair[0], analytics, pair[2])
+        logging.info(build_url)
+        return build_url
+
+    def get_latest_url_nomusic(self):
+        response = requests.get("http://www.tankorsmash.com/sharefolderzip/")
+        response.raise_for_status()
+        soup = bs4.BeautifulSoup(response.content)
+        music_urls = []
+        for anchor in soup.find_all('a'):
+            url = anchor['href']
+            if '.zip' in url:
+                orig_url = url
+                url = url.replace("_NOMUSIC", "")
+                music_urls.append(['http://tankorsmash.com/sharefolderzip/'+orig_url,
+                                   [int(sec) for sec in url.lstrip('v').rstrip('.zip').split('_')],
+                                   url])
         music_urls = sorted(music_urls, key=lambda x: x[1])
         analytics = "onclick=\"var that=this;_gaq.push(['_trackEvent','Download','PDF',this.href]);setTimeout(function(){location.href=that.href;},200);return false;\""
         for pair in music_urls:
             build_url_music = '<a href="%s" %s title="Latest Binary for Windows. Runs on Wine">%s, the latest version without music</a><br>' % (pair[0], analytics, pair[2])
-        logging.info(build_url)
-        return build_url, build_url_music
-        # self.response.write(build_url ) #abuse of locals
+        logging.info(build_url_music)
+        return build_url_music
 
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/main.html')
-        build_url, build_url_music = self.get_latest_url()
         self.response.write(template.render({
-            "latest_build": build_url,
-            "latest_build_nomusic" : build_url_music
+            "latest_build": self.get_latest_url(),
+            "latest_build_nomusic" : self.get_latest_url_nomusic(),
         }))
 
 class ScarJoHandler(webapp2.RequestHandler):
@@ -79,7 +86,7 @@ class ScarJoHandler(webapp2.RequestHandler):
         j = response.json()
         url = j['data']['children'][0]['data']['url']
         return url
-        # self.response.write(build_url ) #abuse of locals
+    # self.response.write(build_url ) #abuse of locals
 
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/scarjo.html')
