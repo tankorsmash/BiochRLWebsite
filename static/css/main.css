@@ -79,6 +79,29 @@ a {
     padding: 10px;
 }
 
+.screenshots {
+    margin-left: 25%;
+    font-size: 50%;
+}
+
+.screens {
+    margin-left: 25%;
+    position: absolute;
+    bottom: 5%;
+}
+
+.screens ul {
+}
+.screens ul li {
+    list-style-type: none;
+    display: inline;
+}
+
+.screens img {
+    width: 125px;
+    height: 100px;
+}
+
 .build-wrap {
     margin: 25px 25% 0 25%;
     background-color: #8E152F;
@@ -92,7 +115,7 @@ a {
 
 .art {
 
-    margin-left: 40%;
+    margin-left: 43%;
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -110,10 +133,10 @@ a {
     /* margin-left: 25%; */
     /* margin-right: 25%; */
     width:100%;
+    font-size: 32px;
 }
 
 .footer-wrap:hover {
-    font-size: 20px;
 }
 
 .footer {
